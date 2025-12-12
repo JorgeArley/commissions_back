@@ -10,6 +10,13 @@ import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { Participant } from './entities/participant.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Commission } from 'src/transaction/entities/commision.entity';
+
+export interface TreeNode {
+  id: string;
+  name: string;
+  children: TreeNode[];
+}
 
 @Injectable()
 export class ParticipantService {
@@ -17,6 +24,9 @@ export class ParticipantService {
   constructor(
     @InjectRepository(Participant)
     private participantRepository: Repository<Participant>,
+
+    @InjectRepository(Commission)
+    private commissionRepo: Repository<Commission>,
   ) {}
 
   async create(createParticipantDto: CreateParticipantDto) {
@@ -41,6 +51,63 @@ export class ParticipantService {
       throw new NotFoundException(`Participant with id ${id} not found`);
     }
     return participant;
+  }
+
+  async getParticipantCommissions(participantId: string) {
+    const participant = await this.participantRepository.findOne({
+      where: { id: participantId },
+    });
+
+    console.log(participant);
+
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+
+    // Obtener comisiones
+    return await this.commissionRepo.find({
+      where: { participantId },
+      relations: ['transaction'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getHierarchyTree(id: string) {
+    const participant = await this.participantRepository.findOne({
+      where: { id },
+    });
+
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+
+    return this.buildTree(participant, 0); // nivel inicial = 0
+  }
+
+  private async buildTree(node: Participant, level: number) {
+    const MAX_LEVEL = 3; // límite de profundidad
+
+    const result: TreeNode = {
+      id: node.id,
+      name: node.name,
+      children: [],
+    };
+
+    // Si ya llegó al nivel máximo → no buscar más hijos
+    if (level >= MAX_LEVEL) {
+      return result;
+    }
+
+    // Buscar hijos directos
+    const children = await this.participantRepository.find({
+      where: { parentId: node.id },
+    });
+
+    result.children = await Promise.all(
+      children.map((child) => this.buildTree(child, level + 1)),
+    );
+
+    return result;
   }
 
   update(id: string, updateParticipantDto: UpdateParticipantDto) {

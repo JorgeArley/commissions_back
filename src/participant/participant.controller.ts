@@ -31,6 +31,18 @@ export class ParticipantController {
     return this.participantService.findOne(id);
   }
 
+  @Get(':id/commissions')
+  async getParticipantCommissions(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.participantService.getParticipantCommissions(id);
+  }
+
+  @Get(':id/tree')
+  async getHierarchyTree(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.participantService.getHierarchyTree(id);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,
