@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -19,9 +18,6 @@ export class CreateParticipantDto {
   @IsString()
   @MinLength(6)
   password: string;
-
-  @IsEnum([1, 2, 3])
-  level: 1 | 2 | 3;
 
   @IsOptional()
   @IsUUID()

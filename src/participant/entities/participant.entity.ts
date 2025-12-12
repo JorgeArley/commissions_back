@@ -1,3 +1,5 @@
+import { Commission } from 'src/transaction/entities/commision.entity';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {
   Column,
   CreateDateColumn,
@@ -22,12 +24,6 @@ export class Participant {
   @Column({ type: 'varchar' })
   password: string;
 
-  @Column({
-    type: 'enum',
-    enum: [1, 2, 3],
-  })
-  level: 1 | 2 | 3;
-
   // Relación self-reference → parentId
   @Column({ type: 'uuid', nullable: true })
   parentId: string;
@@ -40,8 +36,11 @@ export class Participant {
   children: Participant[];
 
   // Relación con transacciones
-  // @OneToMany(() => Transaction, (t) => t.participant)
-  // transactions: Transaction[];
+  @OneToMany(() => Transaction, (t) => t.participant)
+  transactions: Transaction[];
+
+  @OneToMany(() => Commission, (c) => c.participant)
+  commissions: Commission[];
 
   @CreateDateColumn()
   createdAt: Date;
