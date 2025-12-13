@@ -58,8 +58,6 @@ export class ParticipantService {
       where: { id: participantId },
     });
 
-    console.log(participant);
-
     if (!participant) {
       throw new NotFoundException('Participant not found');
     }

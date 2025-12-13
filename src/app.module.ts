@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ParticipantModule } from './participant/participant.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TransactionModule } from './transaction/transaction.module';
     }),
     ParticipantModule,
     TransactionModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
